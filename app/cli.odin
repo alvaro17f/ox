@@ -97,10 +97,10 @@ cli :: proc(current_version: string) {
 			switch (argument) {
 			case "-h", "help":
 				help()
-				break
+				return
 			case "-v", "version":
 				version(current_version)
-				break
+				return
 			case:
 				if (!strings.starts_with(argument, "-")) {
 					break
@@ -162,7 +162,9 @@ cli :: proc(current_version: string) {
 				}
 			}
 		}
+
 		ox(&config)
+		return
 	}
 }
 
