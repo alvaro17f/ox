@@ -40,7 +40,7 @@ OX - A simple CLI tool to update your nixos system
 version :: proc(current_version: string) {
 	using style
 
-	fmt.printfln("%sOX Version: %s%s%s", color.yellow, color.cyan, current_version, color.reset)
+	fmt.printfln("\n%sOX Version: %s%s%s", color.yellow, color.cyan, current_version, color.reset)
 }
 
 @(private)
