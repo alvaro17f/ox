@@ -7,18 +7,20 @@ import "core:strings"
 
 
 confirm :: proc(message: string = "Proceed?", default_value: bool = false) -> bool {
+	using style
+
 	default_value_str := default_value ? "(Y/n)" : "(y/N)"
 
 	buf: [256]byte
 
 	fmt.printf(
 		"\n%s%s%s %s%s%s: ",
-		style.color.yellow,
+		color.yellow,
 		message,
-		style.color.reset,
-		(default_value ? style.color.green : style.color.red),
+		color.reset,
+		(default_value ? color.green : color.red),
 		default_value_str,
-		style.color.reset,
+		color.reset,
 	)
 
 	n, err := os.read(os.stdin, buf[:])

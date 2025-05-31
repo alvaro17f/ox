@@ -37,16 +37,10 @@ OX - A simple CLI tool to update your nixos system
 }
 
 @(private)
-version :: proc() {
-	version := "0.1.0"
+version :: proc(current_version: string) {
+	using style
 
-	fmt.printfln(
-		"%sOX Version: %s%s%s",
-		style.color.yellow,
-		style.color.cyan,
-		version,
-		style.color.reset,
-	)
+	fmt.printfln("%sOX Version: %s%s%s", color.yellow, color.cyan, current_version, color.reset)
 }
 
 @(private)
@@ -59,16 +53,18 @@ get_hostname :: proc() -> string {
 
 @(private)
 styled_config_line :: proc(key: string, value: $T) {
+	using style
+
 	fmt.printfln(
 		"%s ◉ %s%s%s%s = %s%v%s",
-		style.color.cyan,
-		style.color.reset,
-		style.color.red,
+		color.cyan,
+		color.reset,
+		color.red,
 		key,
-		style.color.reset,
-		style.color.cyan,
+		color.reset,
+		color.cyan,
 		value,
-		style.color.reset,
+		color.reset,
 	)
 }
 
@@ -82,7 +78,7 @@ print_config :: proc(config: ^Config) {
 }
 
 
-cli :: proc() {
+cli :: proc(current_version: string) {
 	executable_name := os.args[0]
 	arguments := os.args[1:]
 
@@ -103,7 +99,7 @@ cli :: proc() {
 				help()
 				break
 			case "-v", "version":
-				version()
+				version(current_version)
 				break
 			case:
 				if (!strings.starts_with(argument, "-")) {
