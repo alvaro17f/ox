@@ -1,5 +1,5 @@
 {
-  description = "Odin Devshell";
+  description = "ox";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -21,9 +21,6 @@
 
         buildInputs = with pkgs; [
           odin
-          libGL
-          xorg.libX11
-          openssl
         ];
 
         LD_LIBRARY_PATH =
