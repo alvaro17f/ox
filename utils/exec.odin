@@ -1,6 +1,5 @@
 package utils
 
-import "core:fmt"
 import os "core:os/os2"
 import "core:strings"
 
