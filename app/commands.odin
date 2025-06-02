@@ -10,7 +10,7 @@ cmd_git_pull :: proc(repo: string) {
 cmd_git_diff :: proc(repo: string) -> int {
 	state, err := utils.exec(fmt.tprintf("git -C %s diff --exit-code", repo), false, false)
 	if err != nil {
-		fmt.panicf("Error running git diff: ", err)
+		fmt.panicf("Error running git diff: %s", err)
 	}
 
 	return state.exit_code
