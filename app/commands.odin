@@ -43,8 +43,7 @@ cmd_nix_keep :: proc(repo: string, keep: int) {
 
 cmd_nix_diff :: proc() {
 	utils.exec(
-		"nix profile diff-closures --profile /nix/var/nix/profiles/system",
-		// "nix profile diff-closures --profile /nix/var/nix/profiles/system | tac | awk '/Version/{print; exit} 1' | tac",
+		"nix profile diff-closures --profile /nix/var/nix/profiles/system | tac | awk '/Version/{print; exit} 1' | tac",
 	)
 }
 
