@@ -22,5 +22,6 @@ main :: proc() {
 		}
 	}
 	app.cli(version)
+  free_all(context.temp_allocator)
 }
 
