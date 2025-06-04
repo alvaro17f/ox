@@ -48,7 +48,7 @@ get_hostname :: proc() -> string {
 	uname: posix.utsname
 	posix.uname(&uname)
 
-	return strings.clone(string(uname.nodename[:]))
+	return strings.clone(string(uname.nodename[:]), context.temp_allocator)
 }
 
 @(private)
