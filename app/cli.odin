@@ -1,6 +1,6 @@
 package app
 
-import "../style"
+import s "../style"
 import "../utils"
 import "core:fmt"
 import "core:os"
@@ -38,9 +38,13 @@ OX - A simple CLI tool to update your nixos system
 
 @(private)
 version :: proc(current_version: string) {
-	using style
-
-	fmt.printfln("\n%sOX Version: %s%s%s", color.yellow, color.cyan, current_version, color.reset)
+	fmt.printfln(
+		"\n%sOX Version: %s%s%s",
+		s.color.yellow,
+		s.color.cyan,
+		current_version,
+		s.color.reset,
+	)
 }
 
 @(private)
@@ -53,18 +57,16 @@ get_hostname :: proc() -> string {
 
 @(private)
 styled_config_line :: proc(key: string, value: $T) {
-	using style
-
 	fmt.printfln(
 		"%s ◉ %s%s%s%s = %s%v%s",
-		color.cyan,
-		color.reset,
-		color.red,
+		s.color.cyan,
+		s.color.reset,
+		s.color.red,
 		key,
-		color.reset,
-		color.cyan,
+		s.color.reset,
+		s.color.cyan,
 		value,
-		color.reset,
+		s.color.reset,
 	)
 }
 
@@ -79,11 +81,10 @@ print_config :: proc(config: ^Config) {
 
 
 cli :: proc(current_version: string) {
-	executable_name := os.args[0]
 	arguments := os.args[1:]
 
 	config := Config {
-		repo     = fmt.tprintf("%s/.dotfiles", os.get_env("HOME")),
+		repo     = fmt.tprintf("%s/.dotfiles", os.get_env("HOME", context.temp_allocator)),
 		hostname = get_hostname(),
 		keep     = 10,
 		update   = false,
@@ -117,7 +118,7 @@ cli :: proc(current_version: string) {
 				if (strings.contains_rune(argument, 'r')) {
 					repo: string
 
-					rest := strings.join(arguments[idx + 1:], " ")
+					rest := strings.join(arguments[idx + 1:], " ", context.temp_allocator)
 					idx_end := strings.index_rune(rest, '-')
 
 					if (idx_end == -1) {
@@ -132,7 +133,7 @@ cli :: proc(current_version: string) {
 				if (strings.contains_rune(argument, 'k')) {
 					keep: string
 
-					rest := strings.join(arguments[idx + 1:], " ")
+					rest := strings.join(arguments[idx + 1:], " ", context.temp_allocator)
 					idx_end := strings.index_rune(rest, '-')
 
 					if (idx_end == -1) {
