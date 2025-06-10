@@ -6,6 +6,11 @@ import "core:mem"
 
 version :: "0.1.0"
 
+_main :: proc() {
+	app.cli(version)
+	free_all(context.temp_allocator)
+}
+
 main :: proc() {
 	when ODIN_DEBUG {
 		track: mem.Tracking_Allocator
@@ -14,14 +19,15 @@ main :: proc() {
 
 		defer {
 			if len(track.allocation_map) > 0 {
+				fmt.eprintfln("\n=== %v allocations not freed: ===\n", len(track.allocation_map))
 				for _, entry in track.allocation_map {
-					fmt.eprintf("%v leaked %v bytes\n", entry.location, entry.size)
+					fmt.eprintf("- %v bytes @ %v\n", entry.size, entry.location)
 				}
 			}
 			mem.tracking_allocator_destroy(&track)
 		}
 	}
-	app.cli(version)
-  free_all(context.temp_allocator)
+
+	_main()
 }
 
