@@ -75,7 +75,9 @@ styled_config_line :: proc(key: string, value: $T) {
 
 @(private)
 print_config :: proc(config: ^Config) {
-	utils.title_maker(fmt.tprintf("%s Configuration", config.name))
+	utils.title_maker(
+		fmt.tprintf("%s Configuration", strings.to_upper(config.name, context.temp_allocator)),
+	)
 	styled_config_line("repo", config.repo)
 	styled_config_line("hostname", config.hostname)
 	styled_config_line("keep", config.keep)
