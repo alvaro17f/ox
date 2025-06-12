@@ -18,7 +18,16 @@ when ODIN_ARCH == .arm32 || ODIN_ARCH == .arm64 {
 		process_state: Status,
 		error: os.Error,
 	) {
-		exit_code := libc.system(fmt.ctprint(command))
+
+		exit_code: i32
+
+		if print_stdout || print_stderr {
+			code := libc.system(fmt.ctprint(command))
+			exit_code = code
+		} else {
+			code := libc.system(fmt.ctprintf("%s > /dev/null", command))
+			exit_code = code
+		}
 
 		state := Status {
 			exit_code = exit_code,

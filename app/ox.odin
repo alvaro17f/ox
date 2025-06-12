@@ -14,7 +14,7 @@ ox :: proc(config: ^Config) {
 			utils.title_maker("Nix Update")
 			cmd_nix_update(config.repo)
 		}
-		if (cmd_git_diff(config.repo) == 1) {
+		if (cmd_git_diff(config.repo) != 0) {
 			utils.title_maker("Git Changes")
 			cmd_git_status(config.repo)
 
