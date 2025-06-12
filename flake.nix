@@ -16,6 +16,7 @@
       system:
       let
         name = "ox";
+        version = "0.1.0";
 
         pkgs = import nixpkgs { inherit system; };
 
@@ -41,7 +42,7 @@
           buildInputs = buildInputs;
           LD_LIBRARY_PATH = LD_LIBRARY_PATH;
           buildPhase = ''
-            odin build . -out:${name}
+            odin build . -o:speed -define="VERSION=${version}" -out:${name}
           '';
           installPhase = ''
             mkdir -p $out/bin
