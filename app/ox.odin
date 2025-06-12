@@ -14,13 +14,13 @@ ox :: proc(config: ^Config) {
 			utils.title_maker("Nix Update")
 			cmd_nix_update(config.repo)
 		}
-		if (cmd_git_diff(config.repo) != 0) {
+		if (cmd_is_git_diff(config.repo)) {
 			utils.title_maker("Git Changes")
 			cmd_git_status(config.repo)
 
 			if (utils.confirm("Do you want to add these changes to the stage?", true)) {
 				cmd_git_add(config.repo)
-				if (cmd_git_diff(config.repo) == 0) {
+				if (!cmd_is_git_diff(config.repo)) {
 					fmt.println("Changes added to git stage successfully")
 				} else {
 					fmt.panicf("Error adding changes to git stage")

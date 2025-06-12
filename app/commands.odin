@@ -7,13 +7,13 @@ cmd_git_pull :: proc(repo: string) {
 	utils.exec(fmt.tprintf("git -C %s pull", repo))
 }
 
-cmd_git_diff :: proc(repo: string) -> i32 {
+cmd_is_git_diff :: proc(repo: string) -> bool {
 	state, err := utils.exec(fmt.tprintf("git -C %s diff --exit-code", repo), false, false)
 	if err != nil {
 		fmt.panicf("Error running git diff: %s", err)
 	}
 
-	return i32(state.exit_code)
+	return i32(state.exit_code) != 0
 }
 
 cmd_git_status :: proc(repo: string) {
