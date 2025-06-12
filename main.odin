@@ -3,11 +3,24 @@ package main
 import "app"
 import "core:fmt"
 import "core:mem"
+import "core:os"
 
-version :: #config(VERSION, "dev")
+NAME :: "ox"
+VERSION :: #config(VERSION, "dev")
+
 
 _main :: proc() {
-	app.cli(version)
+	config := app.Config {
+		name     = NAME,
+		version  = VERSION,
+		repo     = fmt.tprintf("%s/.dotfiles", os.get_env("HOME", context.temp_allocator)),
+		hostname = app.get_hostname(),
+		keep     = 10,
+		update   = false,
+		diff     = false,
+	}
+
+	app.cli(&config)
 	free_all(context.temp_allocator)
 }
 

@@ -9,8 +9,9 @@ import "core:strings"
 import "core:sys/posix"
 
 
-@(private)
 Config :: struct {
+	name:     string,
+	version:  string,
 	repo:     string,
 	hostname: string,
 	keep:     int,
@@ -19,11 +20,11 @@ Config :: struct {
 }
 
 @(private)
-help :: proc() {
+help :: proc(app_name: string) {
 	fmt.printfln(
 		`
 ***************************************************
-OX - A simple CLI tool to update your nixos system
+%s - A simple CLI tool to update your nixos system
 ***************************************************
 -r : set repo path (default is $HOME/.dotfiles)
 -n : set hostname (default is OS hostname)
@@ -33,21 +34,23 @@ OX - A simple CLI tool to update your nixos system
 -h, help : Display this help message
 -v, version : Display the current version
   `,
+		strings.to_upper(app_name, context.temp_allocator),
 	)
 }
 
 @(private)
-version :: proc(current_version: string) {
+version :: proc(app_name: string, current_version: string) {
 	fmt.printfln(
-		"\n%sOX Version: %s%s%s",
+		"\n%s%s Version: %s%s%s%s",
 		s.color.yellow,
+		strings.to_upper(app_name, context.temp_allocator),
+		s.color.reset,
 		s.color.cyan,
 		current_version,
 		s.color.reset,
 	)
 }
 
-@(private)
 get_hostname :: proc() -> string {
 	uname: posix.utsname
 	posix.uname(&uname)
@@ -70,8 +73,9 @@ styled_config_line :: proc(key: string, value: $T) {
 	)
 }
 
+@(private)
 print_config :: proc(config: ^Config) {
-	utils.title_maker("OX Configuration")
+	utils.title_maker(fmt.tprintf("%s Configuration", config.name))
 	styled_config_line("repo", config.repo)
 	styled_config_line("hostname", config.hostname)
 	styled_config_line("keep", config.keep)
@@ -80,27 +84,19 @@ print_config :: proc(config: ^Config) {
 }
 
 
-cli :: proc(current_version: string) {
+cli :: proc(config: ^Config) {
 	arguments := os.args[1:]
 
-	config := Config {
-		repo     = fmt.tprintf("%s/.dotfiles", os.get_env("HOME", context.temp_allocator)),
-		hostname = get_hostname(),
-		keep     = 10,
-		update   = false,
-		diff     = false,
-	}
-
 	if (len(arguments) == 0) {
-		ox(&config)
+		ox(config)
 	} else {
 		for argument, idx in arguments {
 			switch (argument) {
 			case "-h", "help":
-				help()
+				help(config.name)
 				return
 			case "-v", "version":
-				version(current_version)
+				version(config.name, config.version)
 				return
 			case:
 				if (!strings.starts_with(argument, "-")) {
@@ -164,7 +160,7 @@ cli :: proc(current_version: string) {
 			}
 		}
 
-		ox(&config)
+		ox(config)
 		return
 	}
 }
