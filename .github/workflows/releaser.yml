@@ -46,6 +46,12 @@ jobs:
       changelog: ${{ steps.build_changelog.outputs.changelog }}
 
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          submodules: true
+
       - name: Build changelog
         id: build_changelog
         uses: mikepenz/release-changelog-builder-action@v4
