@@ -2,6 +2,10 @@ name: tag
 
 on:
   workflow_call:
+    outputs:
+      new_version:
+        description: New version
+        value: ${{ jobs.tag.outputs.new_version }}
 
 jobs:
   tag:
