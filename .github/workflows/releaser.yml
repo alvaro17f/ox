@@ -8,7 +8,34 @@ env:
   NAME: ox
 
 jobs:
-  releaser:
+  tag:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    outputs:
+      new_version: ${{ steps.version.outputs.tag }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          submodules: true
+
+      - name: Detect and tag new version
+        uses: salsify/action-detect-and-tag-new-version@v2
+        id: version
+        with:
+          create-tag: true
+          tag-template: "{VERSION}"
+          version-command: |
+            cat VERSION
+
+  build:
+    needs: tag
+    if: needs.tag.outputs.new_version
     strategy:
       matrix:
         include:
@@ -28,24 +55,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     permissions:
-      id-token: write
       contents: write
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-          submodules: true
-
-      - name: Detect and tag new version
-        uses: salsify/action-detect-and-tag-new-version@v2
-        with:
-          create-tag: true
-          tag-template: "{VERSION}"
-          version-command: |
-            cat VERSION
-
       - name: Setup odin
         uses: laytan/setup-odin@v2
         with:
