@@ -13,16 +13,16 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact_name: ${{ fromJSON(env.NAME) }}
-            asset_name: ${{ fromJSON(env.NAME) }}-linux-amd64.tar.gz
+            artifact_name: ox
+            asset_name: ox-linux-amd64.tar.gz
             asset_directory: /tmp/
           - os: windows-latest
-            artifact_name: ${{ fromJSON(env.NAME) }}.exe
-            asset_name: ${{ fromJSON(env.NAME) }}-windows-amd64.zip
+            artifact_name: ox.exe
+            asset_name: ox-windows-amd64.zip
             asset_directory: D:\tmp\
           - os: macos-latest
-            artifact_name: ${{ fromJSON(env.NAME) }}
-            asset_name: ${{ fromJSON(env.NAME) }}-macos-arm64.tar.gz
+            artifact_name: ox
+            asset_name: ox-macos-arm64.tar.gz
             asset_directory: /tmp/
 
     runs-on: ${{ matrix.os }}
