@@ -70,12 +70,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           release: false
 
-      # - name: Build release
-      #   run: ./build_release.sh
       - name: Build
         shell: bash
         run: |
-          # odin build main -out:${{ matrix.artifact_name }} -vet -strict-style -vet-tabs -disallow-do -warnings-as-errors
+          # odin build . -define="VERSION=${{ needs.tag.outputs.new_version }}" -o:speed -out:${{ matrix.artifact_name }} -vet -strict-style -vet-tabs -disallow-do -warnings-as-errors
           odin build . -define="VERSION=${{ needs.tag.outputs.new_version }}" -o:speed -out:${{ matrix.artifact_name }}
           ./${{ matrix.artifact_name }} -v
 
