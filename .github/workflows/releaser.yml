@@ -59,7 +59,7 @@ jobs:
         run: |
           # odin build main -out:${{ matrix.artifact_name }} -vet -strict-style -vet-tabs -disallow-do -warnings-as-errors
           odin build . -define="VERSION=$(cat VERSION)" -o:speed -out:${{ matrix.artifact_name }}
-          ./${{ matrix.artifact_name }} --version
+          ./${{ matrix.artifact_name }} -v
 
       - name: Compress binary
         shell: bash
