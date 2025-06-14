@@ -7,18 +7,29 @@ on:
 jobs:
   releaser:
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: write
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
+          submodules: true
 
-      - uses: salsify/action-detect-and-tag-new-version@v2
+      - name: Detect and tag new version
+        uses: salsify/action-detect-and-tag-new-version@v2
         with:
           create-tag: true
+          tag-template: "{VERSION}"
+          token: ${{ secrets.GITHUB_TOKEN }}
           version-command: |
             cat VERSION
 
-      - uses: laytan/setup-odin@v2
+      - name: Setup odin
+        uses: laytan/setup-odin@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release: false
