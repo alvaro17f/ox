@@ -3,6 +3,10 @@ name: changelog
 
 on:
   workflow_call:
+    outputs:
+      changelog:
+        description: Changelog
+        value: ${{ jobs.changelog.outputs.changelog }}
 
 jobs:
   changelog:

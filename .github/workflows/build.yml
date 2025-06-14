@@ -6,6 +6,12 @@ on:
       NAME:
         required: true
         type: string
+      VERSION:
+        required: true
+        type: string
+      CHANGELOG:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -39,8 +45,8 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          # odin build . -define="VERSION=${{ needs.tag.outputs.new_version }}" -o:speed -out:${{ matrix.artifact_name }} -vet -strict-style -vet-tabs -disallow-do -warnings-as-errors
-          odin build . -define="VERSION=${{ needs.tag.outputs.new_version }}" -o:speed -out:${{ matrix.artifact_name }}
+          # odin build . -define="VERSION=${{ inputs.VERSION }}" -o:speed -out:${{ matrix.artifact_name }} -vet -strict-style -vet-tabs -disallow-do -warnings-as-errors
+          odin build . -define="VERSION=${{ inputs.VERSION }}" -o:speed -out:${{ matrix.artifact_name }}
           ./${{ matrix.artifact_name }} -v
 
       - name: Compress binary
@@ -60,5 +66,5 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ matrix.asset_directory}}${{ matrix.asset_name }}
           asset_name: ${{ matrix.asset_name }}
-          tag: ${{ needs.tag.outputs.new_version }}
-          body: ${{ needs.changelog.outputs.changelog }}
+          tag: ${{ inputs.VERSION }}
+          body: ${{ inputs.CHANGELOG }}
