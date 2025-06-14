@@ -6,16 +6,16 @@ on:
 
 jobs:
   tag:
-    uses: ./.github/actions/tag.yml
+    uses: ./.github/workflows/tag.yml
 
   changelog:
-    uses: ./.github/actions/changelog.yml
+    uses: ./.github/workflows/changelog.yml
     needs: [tag]
     if: needs.tag.outputs.new_version
 
 
   build:
-    uses: ./.github/actions/build.yml
+    uses: ./.github/workflows/build.yml
     needs: [tag, changelog]
     if: needs.tag.outputs.new_version
     with:
