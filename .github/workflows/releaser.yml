@@ -1,0 +1,26 @@
+name: releaser
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  releaser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: salsify/action-detect-and-tag-new-version@v2
+        with:
+          create-tag: true
+          version-command: cat VERSION
+
+      - uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: false
+
+      - name: Build release
+        run: ./build_release.sh

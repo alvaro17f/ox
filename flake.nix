@@ -16,13 +16,12 @@
       system:
       let
         name = "ox";
-        version = "0.1.0";
 
         pkgs = import nixpkgs { inherit system; };
 
-        buildInputs = with pkgs; [
-          odin
-        ];
+        buildInputs = with pkgs; [ odin ];
+
+        version = pkgs.lib.fileContents ./VERSION;
 
         LD_LIBRARY_PATH =
           with pkgs;
@@ -34,9 +33,8 @@
             ]
           }";
       in
-      with pkgs;
       {
-        packages.default = stdenv.mkDerivation {
+        packages.default = pkgs.stdenv.mkDerivation {
           name = name;
           src = ./.;
           buildInputs = buildInputs;
@@ -50,7 +48,7 @@
           '';
         };
 
-        devShells.default = mkShell {
+        devShells.default = pkgs.mkShell {
           buildInputs = buildInputs;
           LD_LIBRARY_PATH = LD_LIBRARY_PATH;
         };
