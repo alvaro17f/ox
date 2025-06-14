@@ -43,10 +43,10 @@ jobs:
             artifact_name: ox
             asset_name: ox-linux-amd64.tar.gz
             asset_directory: /tmp/
-          - os: windows-latest
-            artifact_name: ox.exe
-            asset_name: ox-windows-amd64.zip
-            asset_directory: D:\tmp\
+          # - os: windows-latest
+          #   artifact_name: ox.exe
+          #   asset_name: ox-windows-amd64.zip
+          #   asset_directory: D:\tmp\
           - os: macos-latest
             artifact_name: ox
             asset_name: ox-macos-arm64.tar.gz
@@ -96,4 +96,4 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ matrix.asset_directory}}${{ matrix.asset_name }}
           asset_name: ${{ matrix.asset_name }}
-          tag: ${{ github.ref }}
+          tag: ${{ needs.tag.outputs.new_version }}
