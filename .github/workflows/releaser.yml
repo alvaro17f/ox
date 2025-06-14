@@ -33,62 +33,20 @@ jobs:
           version-command: |
             cat VERSION
 
-  build:
-    needs: tag
+  changelog:
+    needs: [tag]
     if: needs.tag.outputs.new_version
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            artifact_name: ox
-            asset_name: ox-linux-amd64.tar.gz
-            asset_directory: /tmp/
-          # - os: windows-latest
-          #   artifact_name: ox.exe
-          #   asset_name: ox-windows-amd64.zip
-          #   asset_directory: D:\tmp\
-          - os: macos-latest
-            artifact_name: ox
-            asset_name: ox-macos-arm64.tar.gz
-            asset_directory: /tmp/
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     permissions:
       contents: write
 
+    outputs:
+      changelog: ${{ steps.build_changelog.outputs.changelog }}
+
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-          submodules: true
-
-      - name: Setup odin
-        uses: laytan/setup-odin@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          release: false
-
-      - name: Build
-        shell: bash
-        run: |
-          # odin build . -define="VERSION=${{ needs.tag.outputs.new_version }}" -o:speed -out:${{ matrix.artifact_name }} -vet -strict-style -vet-tabs -disallow-do -warnings-as-errors
-          odin build . -define="VERSION=${{ needs.tag.outputs.new_version }}" -o:speed -out:${{ matrix.artifact_name }}
-          ./${{ matrix.artifact_name }} -v
-
-      - name: Compress binary
-        shell: bash
-        run: |
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            7z a ${{ matrix.asset_name }} ${{ matrix.artifact_name }}
-            mkdir -p D:\\tmp
-            cp ${{ matrix.asset_name }} D:\\tmp\\${{ matrix.asset_name }}
-          else
-            tar -czf /tmp/${{ matrix.asset_name }} ${{ matrix.artifact_name }}
-          fi
-
-      - name: Build Changelog
+      - name: Build changelog
         id: build_changelog
         uses: mikepenz/release-changelog-builder-action@v4
         with:
@@ -152,6 +110,61 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  build:
+    needs: [tag, changelog]
+    if: needs.tag.outputs.new_version
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: ox
+            asset_name: ox-linux-amd64.tar.gz
+            asset_directory: /tmp/
+          # - os: windows-latest
+          #   artifact_name: ox.exe
+          #   asset_name: ox-windows-amd64.zip
+          #   asset_directory: D:\tmp\
+          - os: macos-latest
+            artifact_name: ox
+            asset_name: ox-macos-arm64.tar.gz
+            asset_directory: /tmp/
+
+    runs-on: ${{ matrix.os }}
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          submodules: true
+
+      - name: Setup odin
+        uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: false
+
+      - name: Build
+        shell: bash
+        run: |
+          # odin build . -define="VERSION=${{ needs.tag.outputs.new_version }}" -o:speed -out:${{ matrix.artifact_name }} -vet -strict-style -vet-tabs -disallow-do -warnings-as-errors
+          odin build . -define="VERSION=${{ needs.tag.outputs.new_version }}" -o:speed -out:${{ matrix.artifact_name }}
+          ./${{ matrix.artifact_name }} -v
+
+      - name: Compress binary
+        shell: bash
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            7z a ${{ matrix.asset_name }} ${{ matrix.artifact_name }}
+            mkdir -p D:\\tmp
+            cp ${{ matrix.asset_name }} D:\\tmp\\${{ matrix.asset_name }}
+          else
+            tar -czf /tmp/${{ matrix.asset_name }} ${{ matrix.artifact_name }}
+          fi
+
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
@@ -159,4 +172,4 @@ jobs:
           file: ${{ matrix.asset_directory}}${{ matrix.asset_name }}
           asset_name: ${{ matrix.asset_name }}
           tag: ${{ needs.tag.outputs.new_version }}
-          body: ${{ steps.build_changelog.outputs.changelog }}
+          body: ${{ needs.changelog.outputs.changelog }}
