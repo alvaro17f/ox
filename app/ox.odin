@@ -2,6 +2,7 @@ package app
 
 import "../utils"
 import "core:fmt"
+import "lib:colors"
 
 ox :: proc(config: ^Config) {
 	print_config(config)
@@ -21,9 +22,13 @@ ox :: proc(config: ^Config) {
 			if (utils.confirm("Do you want to add these changes to the stage?", true)) {
 				cmd_git_add(config.repo)
 				if (!cmd_is_git_diff(config.repo)) {
-					fmt.println("Changes added to git stage successfully")
+					fmt.printfln(
+						"%sChanges added to git stage successfully%s",
+						colors.GREEN,
+						colors.RESET,
+					)
 				} else {
-					fmt.panicf("Error adding changes to git stage")
+					fmt.panicf("%sError adding changes to git stage%s", colors.RED, colors.RESET)
 				}
 			}
 		}

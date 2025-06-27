@@ -1,9 +1,9 @@
 package utils
 
-import s "../style"
 import "core:fmt"
 import "core:os"
 import "core:strings"
+import "lib:colors"
 
 
 confirm :: proc(message: string = "Proceed?", default_value: bool = false) -> bool {
@@ -13,12 +13,12 @@ confirm :: proc(message: string = "Proceed?", default_value: bool = false) -> bo
 
 	fmt.printf(
 		"\n%s%s%s %s%s%s: ",
-		s.color.yellow,
+		colors.YELLOW,
 		message,
-		s.color.reset,
-		(default_value ? s.color.green : s.color.red),
+		colors.RESET,
+		(default_value ? colors.GREEN : colors.RED),
 		default_value_str,
-		s.color.reset,
+		colors.RESET,
 	)
 
 	n, err := os.read(os.stdin, buf[:])

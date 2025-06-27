@@ -19,9 +19,9 @@
 
         pkgs = import nixpkgs { inherit system; };
 
-        buildInputs = with pkgs; [ odin ];
-
         version = pkgs.lib.fileContents ./VERSION;
+
+        buildInputs = with pkgs; [ odin ];
 
         LD_LIBRARY_PATH =
           with pkgs;
@@ -40,7 +40,7 @@
           buildInputs = buildInputs;
           LD_LIBRARY_PATH = LD_LIBRARY_PATH;
           buildPhase = ''
-            odin build . -o:speed -define="VERSION=${version}" -out:${name}
+            odin build . -define="VERSION=${version}" -o:speed --collection:lib=lib -out:${name}
           '';
           installPhase = ''
             mkdir -p $out/bin

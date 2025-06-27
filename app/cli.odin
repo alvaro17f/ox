@@ -1,12 +1,12 @@
 package app
 
-import s "../style"
 import "../utils"
 import "core:fmt"
 import "core:os"
 import "core:strconv"
 import "core:strings"
 import "core:sys/posix"
+import "lib:colors"
 
 
 Config :: struct {
@@ -42,12 +42,12 @@ help :: proc(app_name: string) {
 version :: proc(app_name: string, current_version: string) {
 	fmt.printfln(
 		"\n%s%s Version: %s%s%s%s",
-		s.color.yellow,
+		colors.RED,
 		strings.to_upper(app_name, context.temp_allocator),
-		s.color.reset,
-		s.color.cyan,
+		colors.RESET,
+		colors.CYAN,
 		current_version,
-		s.color.reset,
+		colors.RESET,
 	)
 }
 
@@ -62,14 +62,14 @@ get_hostname :: proc() -> string {
 styled_config_line :: proc(key: string, value: $T) {
 	fmt.printfln(
 		"%s ◉ %s%s%s%s = %s%v%s",
-		s.color.cyan,
-		s.color.reset,
-		s.color.red,
+		colors.CYAN,
+		colors.RESET,
+		colors.RED,
 		key,
-		s.color.reset,
-		s.color.cyan,
+		colors.RESET,
+		colors.CYAN,
 		value,
-		s.color.reset,
+		colors.RESET,
 	)
 }
 
