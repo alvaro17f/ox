@@ -4,8 +4,13 @@ package app
 import "../utils"
 import "core:fmt"
 
-cmd_git_pull :: proc(repo: string) {
-	utils.exec(fmt.tprintf("git -C %s pull", repo))
+cmd_git_pull :: proc(repo: string) -> bool {
+	state, err := utils.exec(fmt.tprintf("git -C %s pull", repo))
+	if err != nil {
+		fmt.panicf("Error running git pull: %s", err)
+	}
+
+	return i32(state.exit_code) == 0
 }
 
 cmd_is_git_diff :: proc(repo: string) -> bool {

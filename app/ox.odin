@@ -9,7 +9,9 @@ ox :: proc(config: ^Config) {
 
 	if (utils.confirm(default_value = true)) {
 		utils.title_maker("Git Pull")
-		cmd_git_pull(config.repo)
+		if (!cmd_git_pull(config.repo)) {
+			fmt.panicf("%sError pulling from git%s", colors.RED, colors.RESET)
+		}
 
 		if (config.update) {
 			utils.title_maker("Nix Update")
