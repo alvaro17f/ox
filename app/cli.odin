@@ -42,7 +42,7 @@ help :: proc(app_name: string) {
 version :: proc(app_name: string, current_version: string) {
 	fmt.printfln(
 		"\n%s%s Version: %s%s%s%s",
-		colors.RED,
+		colors.YELLOW,
 		strings.to_upper(app_name, context.temp_allocator),
 		colors.RESET,
 		colors.CYAN,
