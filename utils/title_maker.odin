@@ -1,8 +1,8 @@
 package utils
 
+import "../lib/colors"
 import "core:fmt"
 import "core:strings"
-import "lib:colors"
 
 title_maker :: proc(text: string) {
 	border := len(text) + 4
@@ -30,4 +30,3 @@ title_maker :: proc(text: string) {
 		colors.RESET,
 	)
 }
-

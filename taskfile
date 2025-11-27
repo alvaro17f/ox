@@ -24,19 +24,19 @@ help() {
 }
 
 run() {
-  odin run "$PROJECT_ROOT" -define="VERSION=$VERSION" --collection:lib="$PROJECT_ROOT"/lib "$@"
+  odin run "$PROJECT_ROOT" -define="VERSION=$VERSION" "$@"
 }
 
 debug() {
-  odin run "$PROJECT_ROOT" -define="VERSION=$VERSION" -debug --collection:lib="$PROJECT_ROOT"/lib "$@"
+  odin run "$PROJECT_ROOT" -define="VERSION=$VERSION" -debug "$@"
 }
 
 debug:sanitize() {
-  odin run "$PROJECT_ROOT" -define="VERSION=$VERSION" -debug -sanitize:address --collection:lib="$PROJECT_ROOT"/lib "$@"
+  odin run "$PROJECT_ROOT" -define="VERSION=$VERSION" -debug -sanitize:address "$@"
 }
 
 build() {
-  odin build "$PROJECT_ROOT" -define="VERSION=$VERSION" -o:speed --collection:lib="$PROJECT_ROOT"/lib -out:"$PROJECT_ROOT"/"$APP_NAME" "$@"
+  odin build "$PROJECT_ROOT" -define="VERSION=$VERSION" -o:speed -out:"$PROJECT_ROOT"/"$APP_NAME" "$@"
 }
 
 TIMEFORMAT=$'\nTask completed in %3lR'

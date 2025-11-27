@@ -1,8 +1,8 @@
 package app
 
+import "../lib/colors"
 import "../utils"
 import "core:fmt"
-import "lib:colors"
 
 ox :: proc(config: ^Config) {
 	print_config(config)
@@ -45,4 +45,3 @@ ox :: proc(config: ^Config) {
 		}
 	}
 }
-

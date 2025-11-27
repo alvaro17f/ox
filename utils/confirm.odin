@@ -1,9 +1,9 @@
 package utils
 
+import "../lib/colors"
 import "core:fmt"
 import "core:os"
 import "core:strings"
-import "lib:colors"
 
 
 confirm :: proc(message: string = "Proceed?", default_value: bool = false) -> bool {
@@ -36,4 +36,3 @@ confirm :: proc(message: string = "Proceed?", default_value: bool = false) -> bo
 
 	return default_value
 }
-

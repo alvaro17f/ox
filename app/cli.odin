@@ -1,12 +1,12 @@
 package app
 
+import "../lib/colors"
 import "../utils"
 import "core:fmt"
 import "core:os"
 import "core:strconv"
 import "core:strings"
 import "core:sys/posix"
-import "lib:colors"
 
 
 Config :: struct {
@@ -166,4 +166,3 @@ cli :: proc(config: ^Config) {
 		return
 	}
 }
-
