@@ -28,7 +28,7 @@
           "$LD_LIBRARY_PATH:${
             lib.makeLibraryPath [
               libGL
-              xorg.libX11
+              libx11
               openssl
             ]
           }";
