@@ -2,7 +2,7 @@ package utils
 
 import "core:c/libc"
 import "core:fmt"
-import os "core:os/os2"
+import "core:os"
 
 
 when ODIN_ARCH == .arm32 || ODIN_ARCH == .arm64 {
@@ -56,7 +56,6 @@ when ODIN_ARCH == .arm32 || ODIN_ARCH == .arm64 {
 
 		state := os.process_wait(process) or_return
 
-		os.process_close(process) or_return
 
 		return state, nil
 	}
