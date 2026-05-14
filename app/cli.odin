@@ -87,18 +87,19 @@ print_config :: proc(config: ^Config) {
 
 
 // cli_parse parses command-line arguments and updates config.
+// Returns true if execution should continue to ox(), false to stop.
 // Exported for testing.
-cli_parse :: proc(args: []string, config: ^Config) {
+cli_parse :: proc(args: []string, config: ^Config) -> bool {
 	i := 0
 	for i < len(args) {
 		arg := args[i]
 		switch arg {
 		case "-h", "help":
 			help(config.name)
-			return
+			return false
 		case "-v", "version":
 			version(config.name, config.version)
-			return
+			return false
 		case "-r":
 			if i + 1 < len(args) {
 				config.repo = args[i + 1]
@@ -140,6 +141,8 @@ cli_parse :: proc(args: []string, config: ^Config) {
 			i += 1
 		}
 	}
+
+	return true
 }
 
 
@@ -148,9 +151,7 @@ cli :: proc(config: ^Config) {
 
 	if (len(arguments) == 0) {
 		ox(config)
-	} else {
-		cli_parse(arguments, config)
+	} else if cli_parse(arguments, config) {
 		ox(config)
-		return
 	}
 }
