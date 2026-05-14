@@ -6,10 +6,19 @@ import "core:os"
 import "core:strings"
 
 
-confirm :: proc(message: string = "Proceed?", default_value: bool = false) -> bool {
+Read_Proc :: proc(fd: ^os.File, buf: []byte) -> (int, os.Error)
+
+read_impl :: proc(fd: ^os.File, buf: []byte) -> (int, os.Error) {
+	return os.read(fd, buf)
+}
+
+read_fn: Read_Proc = read_impl
+
+confirm :: proc(message: string = "Proceed?", default_value: bool = false, input: ^os.File = os.stdin) -> (result: bool, err: os.Error) {
 	default_value_str := default_value ? "(Y/n)" : "(y/N)"
 
 	buf: [256]byte
+	pos := 0
 
 	fmt.printf(
 		"\n%s%s%s %s%s%s: ",
@@ -21,18 +30,30 @@ confirm :: proc(message: string = "Proceed?", default_value: bool = false) -> bo
 		colors.RESET,
 	)
 
-	n, err := os.read(os.stdin, buf[:])
-	if err != nil {
-		fmt.panicf("Error reading confirmation: ", err)
+	// Read one byte at a time until newline
+	for pos < len(buf) {
+		n, read_err := read_fn(input, buf[pos:pos+1])
+		if read_err != nil {
+			return default_value, read_err
+		}
+		if n == 0 {
+			break
+		}
+		if buf[pos] == '\n' {
+			pos += 1
+			break
+		}
+		pos += n
 	}
-	confirmation := strings.to_lower(string(buf[:n]), context.temp_allocator)
+
+	confirmation := strings.to_lower(string(buf[:pos]), context.temp_allocator)
 
 	switch (confirmation) {
 	case "y\n", "yes\n":
-		return true
+		return true, nil
 	case "n\n", "no\n":
-		return false
+		return false, nil
 	}
 
-	return default_value
+	return default_value, nil
 }

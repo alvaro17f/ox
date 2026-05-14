@@ -39,5 +39,25 @@ build() {
   odin build "$PROJECT_ROOT" -define="VERSION=$VERSION" -o:speed -out:"$PROJECT_ROOT"/"$APP_NAME" "$@"
 }
 
+test() {
+  odin test "$PROJECT_ROOT" -all-packages -define:ODIN_TEST_THREADS=1 "$@"
+}
+
+test:verbose() {
+  odin test "$PROJECT_ROOT" -all-packages -define:ODIN_TEST_THREADS=1 -define:ODIN_TEST_TRACK_MEMORY=true "$@"
+}
+
+test:json() {
+  odin test "$PROJECT_ROOT" -all-packages -define:ODIN_TEST_THREADS=1 -define:ODIN_TEST_JSON_REPORT=true "$@"
+}
+
+test:leak() {
+  odin test "$PROJECT_ROOT" -all-packages -define:ODIN_TEST_FAIL_ON_BAD_MEMORY=true -define:ODIN_TEST_THREADS=1 "$@"
+}
+
+vet() {
+  odin vet "$PROJECT_ROOT" -all-packages "$@"
+}
+
 TIMEFORMAT=$'\nTask completed in %3lR'
 time "${@:-help}"

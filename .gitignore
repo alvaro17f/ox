@@ -1,2 +1,6 @@
 /ox
 .direnv
+*.profraw
+ox-test
+test-cov
+/coverage*

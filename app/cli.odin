@@ -86,82 +86,70 @@ print_config :: proc(config: ^Config) {
 }
 
 
+// cli_parse parses command-line arguments and updates config.
+// Exported for testing.
+cli_parse :: proc(args: []string, config: ^Config) {
+	i := 0
+	for i < len(args) {
+		arg := args[i]
+		switch arg {
+		case "-h", "help":
+			help(config.name)
+			return
+		case "-v", "version":
+			version(config.name, config.version)
+			return
+		case "-r":
+			if i + 1 < len(args) {
+				config.repo = args[i + 1]
+				i += 2
+			} else {
+				i += 1
+			}
+		case "-k":
+			if i + 1 < len(args) {
+				keep_int, _ := strconv.parse_int(args[i + 1], 10)
+				config.keep = keep_int
+				i += 2
+			} else {
+				i += 1
+			}
+		case "-n":
+			if i + 1 < len(args) {
+				config.hostname = args[i + 1]
+				i += 2
+			} else {
+				i += 1
+			}
+		case "-u":
+			config.update = true
+			i += 1
+		case "-d":
+			config.diff = true
+			i += 1
+		case:
+			// combined flags like -du or -rud
+			if strings.starts_with(arg, "-") {
+				for ch in strings.trim_left(arg, "-") {
+					switch ch {
+					case 'd': config.diff = true
+					case 'u': config.update = true
+					}
+				}
+			}
+			i += 1
+		}
+	}
+}
+
+
 cli :: proc(config: ^Config) {
 	arguments := os.args[1:]
 
 	if (len(arguments) == 0) {
 		ox(config)
 	} else {
-		for argument, idx in arguments {
-			switch (argument) {
-			case "-h", "help":
-				help(config.name)
-				return
-			case "-v", "version":
-				version(config.name, config.version)
-				return
-			case:
-				if (!strings.starts_with(argument, "-")) {
-					break
-				}
-
-				if (strings.contains_rune(argument, 'd')) {
-					config.diff = true
-				}
-
-				if (strings.contains_rune(argument, 'u')) {
-					config.update = true
-				}
-
-				if (strings.contains_rune(argument, 'r')) {
-					repo: string
-
-					rest := strings.join(arguments[idx + 1:], " ", context.temp_allocator)
-					idx_end := strings.index_rune(rest, '-')
-
-					if (idx_end == -1) {
-						repo = rest
-					} else {
-						repo = rest[:idx_end]
-					}
-
-					config.repo = strings.trim(repo, " ")
-				}
-
-				if (strings.contains_rune(argument, 'k')) {
-					keep: string
-
-					rest := strings.join(arguments[idx + 1:], " ", context.temp_allocator)
-					idx_end := strings.index_rune(rest, '-')
-
-					if (idx_end == -1) {
-						keep = rest
-					} else {
-						keep = rest[:idx_end]
-					}
-
-					keep_int, _ := strconv.parse_int(strings.trim(keep, " "), 10)
-
-					config.keep = keep_int
-				}
-
-				if (strings.contains_rune(argument, 'n')) {
-					hostname: string
-
-					rest := strings.join(arguments[idx + 1:], " ")
-					idx_end := strings.index_rune(rest, '-')
-
-					if (idx_end == -1) {
-						hostname = rest
-					} else {
-						hostname = rest[:idx_end]
-					}
-
-					config.hostname = strings.trim(hostname, " ")
-				}
-			}
-		}
-
+		cli_parse(arguments, config)
 		ox(config)
 		return
 	}

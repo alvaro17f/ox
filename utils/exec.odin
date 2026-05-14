@@ -1,64 +1,30 @@
 package utils
 
-import "core:c/libc"
 import "core:fmt"
 import "core:os"
 
 
-when ODIN_ARCH == .arm32 || ODIN_ARCH == .arm64 {
-	Status :: struct {
-		exit_code: i32,
-	}
-
-	exec :: proc(
-		command: string,
-		print_stdout: bool = true,
-		print_stderr: bool = true,
-	) -> (
-		process_state: Status,
-		error: os.Error,
-	) {
-
-		exit_code: i32
-
-		if print_stdout || print_stderr {
-			code := libc.system(fmt.ctprint(command))
-			exit_code = code
-		} else {
-			code := libc.system(fmt.ctprintf("%s > /dev/null", command))
-			exit_code = code
-		}
-
-		state := Status {
-			exit_code = exit_code,
-		}
-
-		return state, nil
-	}
-
-} else {
-	exec :: proc(
-		command: string,
-		print_stdout: bool = true,
-		print_stderr: bool = true,
-	) -> (
-		process_state: os.Process_State,
-		error: os.Error,
-	) {
-		process := os.process_start(
-			{
-				command = []string{"sh", "-c", command},
-				stdin = os.stdin,
-				stdout = print_stdout ? os.stdout : nil,
-				stderr = print_stderr ? os.stderr : nil,
-			},
-		) or_return
-
-		state := os.process_wait(process) or_return
-
-
-		return state, nil
-	}
-
+Exec_Result :: struct {
+	exit_code: i32,
+	success:   bool,
 }
 
+Exec_Proc :: proc(command: string, print_stdout: bool = true, print_stderr: bool = true) -> (Exec_Result, os.Error)
+
+exec_impl :: proc(command: string, print_stdout: bool = true, print_stderr: bool = true) -> (result: Exec_Result, error: os.Error) {
+	process := os.process_start(
+		{
+			command = []string{"sh", "-c", command},
+			stdin = os.stdin,
+			stdout = print_stdout ? os.stdout : nil,
+			stderr = print_stderr ? os.stderr : nil,
+		},
+	) or_return
+
+	state := os.process_wait(process) or_return
+
+	exit_code := i32(state.exit_code)
+	return Exec_Result{exit_code = exit_code, success = exit_code == 0}, nil
+}
+
+exec: Exec_Proc = exec_impl
