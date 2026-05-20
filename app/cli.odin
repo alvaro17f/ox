@@ -87,7 +87,7 @@ print_config :: proc(config: ^Config) {
 	assert(len(config.hostname) > 0)
 	assert(config.keep > 0)
 
-	fmt.print(utils.title_maker_string(
+	fmt.println(utils.title_maker_string(
 		fmt.tprintf("%s Configuration", strings.to_upper(config.name, context.temp_allocator)),
 	))
 	fmt.println(styled_config_line("repo", config.repo))

@@ -30,5 +30,5 @@ title_maker_string :: proc(text: string) -> string {
 
 title_maker :: proc(text: string) {
 	assert(len(text) >= 0)
-	fmt.print(title_maker_string(text))
+	fmt.println(title_maker_string(text))
 }
