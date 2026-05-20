@@ -20,6 +20,12 @@ _main :: proc() {
 		diff     = false,
 	}
 
+	assert(len(config.name) > 0)
+	assert(len(config.version) > 0)
+	assert(len(config.repo) > 0)
+	assert(len(config.hostname) > 0)
+	assert(config.keep > 0)
+
 	app.cli(&config)
 	free_all(context.temp_allocator)
 }
@@ -43,4 +49,3 @@ main :: proc() {
 
 	_main()
 }
-

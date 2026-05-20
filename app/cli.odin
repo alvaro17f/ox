@@ -21,6 +21,7 @@ Config :: struct {
 
 @(private)
 help :: proc(app_name: string) -> string {
+	assert(len(app_name) > 0)
 	return fmt.tprintf(
 		`
 ***************************************************
@@ -40,6 +41,8 @@ help :: proc(app_name: string) -> string {
 
 @(private)
 version :: proc(app_name: string, current_version: string) -> string {
+	assert(len(app_name) > 0)
+	assert(len(current_version) > 0)
 	return fmt.tprintf(
 		"\n%s%s Version: %s%s%s%s",
 		colors.YELLOW,
@@ -55,11 +58,14 @@ get_hostname :: proc() -> string {
 	uname: posix.utsname
 	posix.uname(&uname)
 
-	return strings.clone(string(uname.nodename[:]), context.temp_allocator)
+	result := strings.clone(string(uname.nodename[:]), context.temp_allocator)
+	assert(len(result) > 0)
+	return result
 }
 
 @(private)
 styled_config_line :: proc(key: string, value: $T) -> string {
+	assert(len(key) > 0)
 	return fmt.tprintf(
 		"%s ◉ %s%s%s%s = %s%v%s",
 		colors.CYAN,
@@ -75,6 +81,12 @@ styled_config_line :: proc(key: string, value: $T) -> string {
 
 @(private)
 print_config :: proc(config: ^Config) {
+	assert(config != nil)
+	assert(len(config.name) > 0)
+	assert(len(config.repo) > 0)
+	assert(len(config.hostname) > 0)
+	assert(config.keep > 0)
+
 	fmt.print(utils.title_maker_string(
 		fmt.tprintf("%s Configuration", strings.to_upper(config.name, context.temp_allocator)),
 	))
@@ -90,19 +102,22 @@ print_config :: proc(config: ^Config) {
 // Returns true if execution should continue to ox(), false to stop.
 // Exported for testing.
 cli_parse :: proc(args: []string, config: ^Config) -> bool {
+	assert(config != nil)
+
 	i := 0
 	for i < len(args) {
 		arg := args[i]
 		switch arg {
 		case "-h", "help":
-			help(config.name)
+			fmt.println(help(config.name))
 			return false
 		case "-v", "version":
-			version(config.name, config.version)
+			fmt.println(version(config.name, config.version))
 			return false
 		case "-r":
 			if i + 1 < len(args) {
 				config.repo = args[i + 1]
+				assert(len(config.repo) > 0)
 				i += 2
 			} else {
 				i += 1
@@ -110,6 +125,7 @@ cli_parse :: proc(args: []string, config: ^Config) -> bool {
 		case "-k":
 			if i + 1 < len(args) {
 				keep_int, _ := strconv.parse_int(args[i + 1], 10)
+				assert(keep_int > 0)
 				config.keep = keep_int
 				i += 2
 			} else {
@@ -118,6 +134,7 @@ cli_parse :: proc(args: []string, config: ^Config) -> bool {
 		case "-n":
 			if i + 1 < len(args) {
 				config.hostname = args[i + 1]
+				assert(len(config.hostname) > 0)
 				i += 2
 			} else {
 				i += 1
@@ -147,6 +164,9 @@ cli_parse :: proc(args: []string, config: ^Config) -> bool {
 
 
 cli_run :: proc(config: ^Config, args: []string, input: ^os.File = os.stdin) {
+	assert(config != nil)
+	assert(input != nil)
+
 	if (len(args) == 0) {
 		err := ox(config, input)
 		if err != nil {
@@ -161,5 +181,6 @@ cli_run :: proc(config: ^Config, args: []string, input: ^os.File = os.stdin) {
 }
 
 cli :: proc(config: ^Config) {
+	assert(config != nil)
 	cli_run(config, os.args[1:])
 }

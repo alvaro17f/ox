@@ -7,6 +7,9 @@ import "core:strings"
 
 
 confirm :: proc(message: string = "Proceed?", default_value: bool = false, input: ^os.File = os.stdin) -> (result: bool, err: os.Error) {
+	assert(input != nil)
+	assert(len(message) > 0)
+
 	default_value_str := default_value ? "(Y/n)" : "(y/N)"
 
 	buf: [256]byte
@@ -37,6 +40,8 @@ confirm :: proc(message: string = "Proceed?", default_value: bool = false, input
 		}
 		pos += n
 	}
+
+	assert(pos <= len(buf))
 
 	confirmation := strings.to_lower(string(buf[:pos]), context.temp_allocator)
 

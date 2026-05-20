@@ -12,6 +12,8 @@ Exec_Result :: struct {
 Exec_Proc :: proc(command: string, print_stdout: bool = true, print_stderr: bool = true) -> (Exec_Result, os.Error)
 
 exec_impl :: proc(command: string, print_stdout: bool = true, print_stderr: bool = true) -> (result: Exec_Result, error: os.Error) {
+	assert(len(command) > 0)
+
 	process := os.process_start(
 		{
 			command = []string{"sh", "-c", command},
@@ -24,6 +26,7 @@ exec_impl :: proc(command: string, print_stdout: bool = true, print_stderr: bool
 	state := os.process_wait(process) or_return
 
 	exit_code := i32(state.exit_code)
+	assert(exit_code >= 0)
 	return Exec_Result{exit_code = exit_code, success = exit_code == 0}, nil
 }
 

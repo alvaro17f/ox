@@ -5,7 +5,11 @@ import "core:fmt"
 import "core:strings"
 
 title_maker_string :: proc(text: string) -> string {
+	assert(len(text) >= 0)
+
 	border := len(text) + 4
+	assert(border >= 4)
+
 	return fmt.tprintf(
 		"\n%s%s%s\n%s*%s %s%s%s %s*%s\n%s%s%s",
 		colors.BLUE,
@@ -25,5 +29,6 @@ title_maker_string :: proc(text: string) -> string {
 }
 
 title_maker :: proc(text: string) {
+	assert(len(text) >= 0)
 	fmt.print(title_maker_string(text))
 }

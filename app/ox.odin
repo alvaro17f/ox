@@ -8,6 +8,12 @@ import "core:os"
 
 // ox_workflow is the testable core. Returns error instead of panicking.
 ox_workflow :: proc(config: ^Config, input: ^os.File = os.stdin) -> (err: os.Error) {
+	assert(config != nil)
+	assert(input != nil)
+	assert(len(config.repo) > 0)
+	assert(len(config.hostname) > 0)
+	assert(config.keep > 0)
+
 	print_config(config)
 
 	proceed, c_err := utils.confirm(default_value = true, input = input)
@@ -102,5 +108,7 @@ ox_workflow :: proc(config: ^Config, input: ^os.File = os.stdin) -> (err: os.Err
 
 // ox runs the workflow. Returns error for testability.
 ox :: proc(config: ^Config, input: ^os.File = os.stdin) -> os.Error {
+	assert(config != nil)
+	assert(input != nil)
 	return ox_workflow(config, input)
 }
