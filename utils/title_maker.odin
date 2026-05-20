@@ -4,17 +4,13 @@ import "../lib/colors"
 import "core:fmt"
 import "core:strings"
 
-title_maker :: proc(text: string) {
+title_maker_string :: proc(text: string) -> string {
 	border := len(text) + 4
-
-	fmt.printfln(
-		"\n%s%s%s",
+	return fmt.tprintf(
+		"\n%s%s%s\n%s*%s %s%s%s %s*%s\n%s%s%s",
 		colors.BLUE,
 		strings.repeat("*", border, context.temp_allocator),
 		colors.RESET,
-	)
-	fmt.printfln(
-		"%s*%s %s%s%s %s*%s",
 		colors.BLUE,
 		colors.RESET,
 		colors.RED,
@@ -22,11 +18,12 @@ title_maker :: proc(text: string) {
 		colors.RESET,
 		colors.BLUE,
 		colors.RESET,
-	)
-	fmt.printfln(
-		"%s%s%s",
 		colors.BLUE,
 		strings.repeat("*", border, context.temp_allocator),
 		colors.RESET,
 	)
+}
+
+title_maker :: proc(text: string) {
+	fmt.print(title_maker_string(text))
 }

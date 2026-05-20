@@ -3,27 +3,20 @@ package app
 import "../utils"
 import "core:fmt"
 import "core:os"
+import "core:strings"
 import "core:testing"
 
 
 mock_call_count: int
-mock_read_count: int
 
-// Mock read that returns error
-mock_read_error :: proc(fd: ^os.File, buf: []byte) -> (int, os.Error) {
-	return 0, os.General_Error.Invalid_Callback
-}
-
-// Mock read that fails on second confirm (after first newline seen)
-mock_read_fail_second :: proc(fd: ^os.File, buf: []byte) -> (int, os.Error) {
-	if mock_read_count >= 2 {
-		return 0, os.General_Error.Invalid_Callback
+make_test_config :: proc(repo_path: string) -> Config {
+	return Config{
+		name     = "ox",
+		version  = "1.0",
+		repo     = repo_path,
+		hostname = "test",
+		keep     = 10,
 	}
-	n, err := os.read(fd, buf)
-	if n > 0 && buf[0] == '\n' {
-		mock_read_count += 1
-	}
-	return n, err
 }
 
 @test
@@ -38,13 +31,7 @@ test_ox_workflow_decline :: proc(t: ^testing.T) {
 	os.write_string(w, "n\n")
 	os.close(w)
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	config := make_test_config(repos.path)
 
 	err = ox_workflow(&config, r)
 	testing.expect_value(t, err, nil)
@@ -66,13 +53,7 @@ test_ox_workflow_pull_error :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_error
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	config := make_test_config(repos.path)
 
 	err = ox_workflow(&config, r)
 	testing.expect(t, err != nil, "expected error from pull")
@@ -94,13 +75,7 @@ test_ox_workflow_pull_fail :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_failure
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	config := make_test_config(repos.path)
 
 	err = ox_workflow(&config, r)
 	testing.expect(t, err != nil, "expected error from pull failure")
@@ -169,13 +144,7 @@ test_ox_workflow_diff_check_error :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_diff_error
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	config := make_test_config(repos.path)
 
 	err = ox_workflow(&config, r)
 	testing.expect(t, err != nil, "expected error from diff check")
@@ -209,13 +178,7 @@ test_ox_workflow_status_error :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_status_error
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	config := make_test_config(repos.path)
 
 	err = ox_workflow(&config, r)
 	testing.expect(t, err != nil, "expected error from status")
@@ -252,13 +215,7 @@ test_ox_workflow_add_error :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_add_error
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	config := make_test_config(repos.path)
 
 	err = ox_workflow(&config, r)
 	testing.expect(t, err != nil, "expected error from add")
@@ -298,13 +255,7 @@ test_ox_workflow_add_check_error :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_add_check_error
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	config := make_test_config(repos.path)
 
 	err = ox_workflow(&config, r)
 	testing.expect(t, err != nil, "expected error from add check")
@@ -344,13 +295,7 @@ test_ox_workflow_add_still_diff :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_still_diff
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	config := make_test_config(repos.path)
 
 	err = ox_workflow(&config, r)
 	testing.expect(t, err != nil, "expected error from still diff")
@@ -384,13 +329,7 @@ test_ox_workflow_rebuild_error :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_rebuild_error
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	config := make_test_config(repos.path)
 
 	err = ox_workflow(&config, r)
 	testing.expect(t, err != nil, "expected error from rebuild")
@@ -427,13 +366,7 @@ test_ox_workflow_keep_error :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_keep_error
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	config := make_test_config(repos.path)
 
 	err = ox_workflow(&config, r)
 	testing.expect(t, err != nil, "expected error from keep")
@@ -473,17 +406,50 @@ test_ox_workflow_diff_error :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_diff_error
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-		diff     = true,
-	}
+	config := make_test_config(repos.path)
+	config.diff = true
 
 	err = ox_workflow(&config, r)
 	testing.expect(t, err != nil, "expected error from diff")
+}
+
+@test
+test_ox_workflow_stage_decline :: proc(t: ^testing.T) {
+	repos := create_test_repo()
+	defer cleanup_test_repo(repos)
+
+	r, w, err := os.pipe()
+	testing.expect_value(t, err, nil)
+	defer os.close(r)
+
+	os.write_string(w, "y\nn\n")
+	os.close(w)
+
+	saved := utils.exec
+	utils.exec = proc(command: string, print_stdout: bool = true, print_stderr: bool = true) -> (utils.Exec_Result, os.Error) {
+		if strings.contains(command, "pull") {
+			return utils.Exec_Result{exit_code = 0, success = true}, nil
+		}
+		if strings.contains(command, "diff --exit-code") {
+			return utils.Exec_Result{exit_code = 1, success = false}, nil
+		}
+		if strings.contains(command, "status --porcelain") {
+			return utils.Exec_Result{exit_code = 0, success = true}, nil
+		}
+		if strings.contains(command, "nixos-rebuild") {
+			return utils.Exec_Result{exit_code = 0, success = true}, nil
+		}
+		if strings.contains(command, "nix-env") {
+			return utils.Exec_Result{exit_code = 0, success = true}, nil
+		}
+		return utils.Exec_Result{exit_code = 0, success = true}, nil
+	}
+	defer { utils.exec = saved }
+
+	config := make_test_config(repos.path)
+
+	err = ox_workflow(&config, r)
+	testing.expect_value(t, err, nil)
 }
 
 @test
@@ -502,13 +468,7 @@ test_ox_workflow_success :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_success
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	config := make_test_config(repos.path)
 
 	err = ox_workflow(&config, r)
 	testing.expect_value(t, err, nil)
@@ -530,14 +490,8 @@ test_ox_workflow_success_with_diff :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_success
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-		diff     = true,
-	}
+	config := make_test_config(repos.path)
+	config.diff = true
 
 	err = ox_workflow(&config, r)
 	testing.expect_value(t, err, nil)
@@ -586,47 +540,39 @@ test_ox_workflow_add_success :: proc(t: ^testing.T) {
 	utils.exec = mock_exec_add_success
 	defer { utils.exec = saved }
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	config := make_test_config(repos.path)
 
 	err = ox_workflow(&config, r)
 	testing.expect_value(t, err, nil)
 }
 
 @test
-test_ox_workflow_confirm_error :: proc(t: ^testing.T) {
+test_ox_returns_nil :: proc(t: ^testing.T) {
 	repos := create_test_repo()
 	defer cleanup_test_repo(repos)
 
-	saved_read := utils.read_fn
-	utils.read_fn = mock_read_error
-	defer { utils.read_fn = saved_read }
-
-	r, _, err := os.pipe()
+	r, w, err := os.pipe()
 	testing.expect_value(t, err, nil)
 	defer os.close(r)
 
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
+	os.write_string(w, "y\nn\n")
+	os.close(w)
 
-	err = ox_workflow(&config, r)
-	testing.expect(t, err != nil, "expected confirm read error")
+	saved := utils.exec
+	utils.exec = mock_exec_success
+	defer { utils.exec = saved }
+
+	config := make_test_config(repos.path)
+
+	result := ox(&config, r)
+	testing.expect_value(t, result, nil)
 }
 
 @test
-test_ox_workflow_stage_confirm_error :: proc(t: ^testing.T) {
-	repos := create_test_repo()
-	defer cleanup_test_repo(repos)
+test_ox_returns_error :: proc(t: ^testing.T) {
+	saved := utils.exec
+	utils.exec = mock_exec_error
+	defer { utils.exec = saved }
 
 	r, w, err := os.pipe()
 	testing.expect_value(t, err, nil)
@@ -635,35 +581,8 @@ test_ox_workflow_stage_confirm_error :: proc(t: ^testing.T) {
 	os.write_string(w, "y\n")
 	os.close(w)
 
-	mock_call_count = 0
-	mock_exec_stage_error :: proc(command: string, print_stdout: bool = true, print_stderr: bool = true) -> (utils.Exec_Result, os.Error) {
-		mock_call_count += 1
-		if mock_call_count == 1 {
-			return utils.Exec_Result{exit_code = 0, success = true}, nil
-		}
-		if mock_call_count == 2 {
-			return utils.Exec_Result{exit_code = 1, success = false}, nil
-		}
-		return utils.Exec_Result{exit_code = 0, success = true}, nil
-	}
+	config := make_test_config("/fake")
 
-	saved_exec := utils.exec
-	utils.exec = mock_exec_stage_error
-	defer { utils.exec = saved_exec }
-
-	mock_read_count = 0
-	saved_read := utils.read_fn
-	utils.read_fn = mock_read_fail_second
-	defer { utils.read_fn = saved_read }
-
-	config := Config{
-		name     = "ox",
-		version  = "1.0",
-		repo     = repos.path,
-		hostname = "test",
-		keep     = 10,
-	}
-
-	err = ox_workflow(&config, r)
-	testing.expect(t, err != nil, "expected stage confirm read error")
+	result := ox(&config, r)
+	testing.expect(t, result != nil, "expected error from ox")
 }

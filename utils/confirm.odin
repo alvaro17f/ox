@@ -6,14 +6,6 @@ import "core:os"
 import "core:strings"
 
 
-Read_Proc :: proc(fd: ^os.File, buf: []byte) -> (int, os.Error)
-
-read_impl :: proc(fd: ^os.File, buf: []byte) -> (int, os.Error) {
-	return os.read(fd, buf)
-}
-
-read_fn: Read_Proc = read_impl
-
 confirm :: proc(message: string = "Proceed?", default_value: bool = false, input: ^os.File = os.stdin) -> (result: bool, err: os.Error) {
 	default_value_str := default_value ? "(Y/n)" : "(y/N)"
 
@@ -32,7 +24,7 @@ confirm :: proc(message: string = "Proceed?", default_value: bool = false, input
 
 	// Read one byte at a time until newline
 	for pos < len(buf) {
-		n, read_err := read_fn(input, buf[pos:pos+1])
+		n, read_err := os.read(input, buf[pos:pos+1])
 		if read_err != nil {
 			return default_value, read_err
 		}

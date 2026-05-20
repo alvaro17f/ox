@@ -3,6 +3,7 @@ package app
 import "../utils"
 import "core:fmt"
 import "core:os"
+import "core:strings"
 import "core:testing"
 
 
@@ -121,6 +122,16 @@ test_cmd_git_status :: proc(t: ^testing.T) {
 }
 
 @test
+test_cmd_git_status_error :: proc(t: ^testing.T) {
+	saved := utils.exec
+	utils.exec = mock_exec_error
+	defer { utils.exec = saved }
+
+	err := cmd_git_status("/fake")
+	testing.expect(t, err != nil, "expected error")
+}
+
+@test
 test_cmd_git_add :: proc(t: ^testing.T) {
 	repos := create_test_repo()
 	defer cleanup_test_repo(repos)
@@ -133,20 +144,22 @@ test_cmd_git_add :: proc(t: ^testing.T) {
 
 @test
 test_cmd_nix_keep :: proc(t: ^testing.T) {
-	repos := create_test_repo()
-	defer cleanup_test_repo(repos)
+	saved := utils.exec
+	utils.exec = mock_exec_success
+	defer { utils.exec = saved }
 
-	err := cmd_nix_keep(repos.path, 10)
-	_ = err
+	err := cmd_nix_keep("/repo", 10)
+	testing.expect_value(t, err, nil)
 }
 
 @test
 test_cmd_nix_update :: proc(t: ^testing.T) {
-	repos := create_test_repo()
-	defer cleanup_test_repo(repos)
+	saved := utils.exec
+	utils.exec = mock_exec_success
+	defer { utils.exec = saved }
 
-	err := cmd_nix_update(repos.path)
-	_ = err
+	err := cmd_nix_update("/repo")
+	testing.expect_value(t, err, nil)
 }
 
 @test
@@ -161,11 +174,12 @@ test_cmd_nix_update_error :: proc(t: ^testing.T) {
 
 @test
 test_cmd_nix_rebuild :: proc(t: ^testing.T) {
-	repos := create_test_repo()
-	defer cleanup_test_repo(repos)
+	saved := utils.exec
+	utils.exec = mock_exec_success
+	defer { utils.exec = saved }
 
-	err := cmd_nix_rebuild(repos.path, "test")
-	_ = err
+	err := cmd_nix_rebuild("/repo", "myhost")
+	testing.expect_value(t, err, nil)
 }
 
 @test
@@ -180,8 +194,12 @@ test_cmd_nix_rebuild_error :: proc(t: ^testing.T) {
 
 @test
 test_cmd_nix_diff :: proc(t: ^testing.T) {
+	saved := utils.exec
+	utils.exec = mock_exec_success
+	defer { utils.exec = saved }
+
 	err := cmd_nix_diff()
-	_ = err
+	testing.expect_value(t, err, nil)
 }
 
 @test

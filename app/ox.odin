@@ -100,10 +100,7 @@ ox_workflow :: proc(config: ^Config, input: ^os.File = os.stdin) -> (err: os.Err
 }
 
 
-// ox is the top-level entry point. Panics on error (only place).
-ox :: proc(config: ^Config) {
-	err := ox_workflow(config)
-	if err != nil {
-		fmt.panicf("Error: %s", err)
-	}
+// ox runs the workflow. Returns error for testability.
+ox :: proc(config: ^Config, input: ^os.File = os.stdin) -> os.Error {
+	return ox_workflow(config, input)
 }

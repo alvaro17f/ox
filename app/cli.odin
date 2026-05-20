@@ -20,8 +20,8 @@ Config :: struct {
 }
 
 @(private)
-help :: proc(app_name: string) {
-	fmt.printfln(
+help :: proc(app_name: string) -> string {
+	return fmt.tprintf(
 		`
 ***************************************************
 %s - A simple CLI tool to update your nixos system
@@ -39,8 +39,8 @@ help :: proc(app_name: string) {
 }
 
 @(private)
-version :: proc(app_name: string, current_version: string) {
-	fmt.printfln(
+version :: proc(app_name: string, current_version: string) -> string {
+	return fmt.tprintf(
 		"\n%s%s Version: %s%s%s%s",
 		colors.YELLOW,
 		strings.to_upper(app_name, context.temp_allocator),
@@ -59,8 +59,8 @@ get_hostname :: proc() -> string {
 }
 
 @(private)
-styled_config_line :: proc(key: string, value: $T) {
-	fmt.printfln(
+styled_config_line :: proc(key: string, value: $T) -> string {
+	return fmt.tprintf(
 		"%s ◉ %s%s%s%s = %s%v%s",
 		colors.CYAN,
 		colors.RESET,
@@ -75,14 +75,14 @@ styled_config_line :: proc(key: string, value: $T) {
 
 @(private)
 print_config :: proc(config: ^Config) {
-	utils.title_maker(
+	fmt.print(utils.title_maker_string(
 		fmt.tprintf("%s Configuration", strings.to_upper(config.name, context.temp_allocator)),
-	)
-	styled_config_line("repo", config.repo)
-	styled_config_line("hostname", config.hostname)
-	styled_config_line("keep", config.keep)
-	styled_config_line("update", config.update)
-	styled_config_line("diff", config.diff)
+	))
+	fmt.println(styled_config_line("repo", config.repo))
+	fmt.println(styled_config_line("hostname", config.hostname))
+	fmt.println(styled_config_line("keep", config.keep))
+	fmt.println(styled_config_line("update", config.update))
+	fmt.println(styled_config_line("diff", config.diff))
 }
 
 
@@ -146,12 +146,20 @@ cli_parse :: proc(args: []string, config: ^Config) -> bool {
 }
 
 
-cli :: proc(config: ^Config) {
-	arguments := os.args[1:]
-
-	if (len(arguments) == 0) {
-		ox(config)
-	} else if cli_parse(arguments, config) {
-		ox(config)
+cli_run :: proc(config: ^Config, args: []string, input: ^os.File = os.stdin) {
+	if (len(args) == 0) {
+		err := ox(config, input)
+		if err != nil {
+			fmt.panicf("Error: %s", err)
+		}
+	} else if cli_parse(args, config) {
+		err := ox(config, input)
+		if err != nil {
+			fmt.panicf("Error: %s", err)
+		}
 	}
+}
+
+cli :: proc(config: ^Config) {
+	cli_run(config, os.args[1:])
 }

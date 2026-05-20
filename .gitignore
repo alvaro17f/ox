@@ -4,3 +4,4 @@
 ox-test
 test-cov
 /coverage*
+*.bin
